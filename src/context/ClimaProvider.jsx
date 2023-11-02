@@ -11,6 +11,8 @@ const ClimaProvider = ({ children }) => {
   });
 
   const [resultado, setResultado] = useState({});
+  const [cargando, setCargando] = useState(false);
+  const [noResultado, setNoResultado] = useState('');
 
   const datosBusqueda = e => {
     setBusqueda({
@@ -20,6 +22,9 @@ const ClimaProvider = ({ children }) => {
   };
 
   const consultarClima = async datos => {
+    setCargando(true);
+    setNoResultado('');
+
     try {
       const { ciudad, pais } = datos;
       const appId = import.meta.env.VITE_API_KEY;
@@ -31,10 +36,15 @@ const ClimaProvider = ({ children }) => {
       const urlClima = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${appId}`;
 
       const { data: clima } = await axios(urlClima);
+
       setResultado(clima);
     }
     catch (error) {
-      console.log(error);
+      setNoResultado('No hay Resultados');
+      setResultado({});
+    }
+    finally {
+      setCargando(false);
     }
   };
 
@@ -45,6 +55,8 @@ const ClimaProvider = ({ children }) => {
         datosBusqueda,
         consultarClima,
         resultado,
+        cargando,
+        noResultado,
       }}
     >
       {children}
